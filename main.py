@@ -7,7 +7,7 @@ from pyzbar.pyzbar import decode
 import time
 
 
-def afstand_bereken(points):
+def distance_calc(points):
     print(points)
     width = points[2, 0] - points[0, 0]
     print(points[3, 0])
@@ -18,6 +18,19 @@ def afstand_bereken(points):
     return distance
 
 
+def print_QR_information(image,pts,x, y, barcodeData,  barcodeType):
+    cv2.polylines(image, [pts], True, (0, 255, 0), 3)
+    string = "Data: " + str(barcodeData) + " | Type: " + str(barcodeType)
+    cv2.putText(frame, string, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+    print("Barcode: " + barcodeData + " | Type: " + barcodeType)
+
+
+def print_QR_distance(image, distance):
+    cv2.putText(image, "%.2f m" % distance,
+                (image.shape[1] - 300, image.shape[0] - 100), cv2.FONT_HERSHEY_SIMPLEX,
+                2.0, (0, 255, 0), 3)
+
+
 def decoder(image):
     gray_img = cv2.cvtColor(image, 0)
     barcode = decode(gray_img)
@@ -26,28 +39,11 @@ def decoder(image):
         points = obj.polygon
         (x, y, w, h) = obj.rect
         pts = np.array(points, np.int32)
-
-        distance = afstand_bereken(points)
-        # print(pts)
-        # width = pts[2, 0] - pts[0, 0]
-        # print(pts[3, 0])
-        # print(pts[0, 0])
-        # print(width)
-        # Distance =(0.2 * 655) / width
-        # print(Distance)
-
-        cv2.putText(image, "%.2f m" % distance,
-                    (image.shape[1] - 300, image.shape[0] - 100), cv2.FONT_HERSHEY_SIMPLEX,
-                    2.0, (0, 255, 0), 3)
-        cv2.polylines(image, [pts], True, (0, 255, 0), 3)
-
         barcodeData = obj.data.decode("utf-8")
         barcodeType = obj.type
-        string = "Data: " + str(barcodeData) + " | Type: " + str(barcodeType)
-
-        cv2.putText(frame, string, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
-        print("Barcode: "+barcodeData + " | Type: "+barcodeType)
-        # time.sleep(1)
+        distance = distance_calc(pts)
+        print_QR_information(image,pts,x ,y, barcodeData, barcodeType)
+        print_QR_distance(image, distance)
 
 
 # cap = cv2.VideoCapture(0)
