@@ -46,36 +46,42 @@ def decoder(image):
         print_QR_distance(image, distance)
 
 
-# cap = cv2.VideoCapture(0)
-stream = CamGear(source=0).start()
-scale = 1
-while True:
-    frame = stream.read()
+def digtal_zoom(image,scale, code):
+    height, width, channels = image.shape
+    if code == ord('u'):
+        scale = scale + 0.05  # +5
 
-    height, width, channels = frame.shape
+    if code == ord('d'):
+        scale = scale - 0.05  # +5
     # centerX, centerY = int(height / 2), int(width / 2)
     # prepare the crop
+    print(scale)
     centerX, centerY = int(height / 2), int(width / 2)
     radiusX, radiusY = int(centerX * scale), int(centerY * scale)
 
     minX, maxX = centerX - radiusX, centerX + radiusX
     minY, maxY = centerY - radiusY, centerY + radiusY
 
-    cropped = frame[minX:maxX, minY:maxY]
-    frame = cv2.resize(cropped, (width, height))
+    cropped = image[minX:maxX, minY:maxY]
+    image = cv2.resize(cropped, (width, height))
+    return image, scale
 
+
+
+# cap = cv2.VideoCapture(0)
+stream = CamGear(source=0).start()
+scale = 1
+
+
+
+while True:
+    frame = stream.read()
     if frame is None:
         break
-
     decoder(frame)
-    cv2.imshow('Image', frame)
     code = cv2.waitKey(10)
-    if code == ord('u'):
-        scale = scale + 0.05  # +5
-
-    if code == ord('d'):
-        scale = scale - 0.05  # +5
-
+    frame, scale = digtal_zoom(frame,scale, code)
+    cv2.imshow('Image', frame)
     if cv2.waitKey(1) == 27:
         break  # esc to quit
 cv2.destroyAllWindows()
