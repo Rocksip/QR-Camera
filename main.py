@@ -6,7 +6,6 @@ import cv2
 from pyzbar.pyzbar import decode
 import time
 
-
 def distance_calc(points):
     print(points)
     width = points[2, 0] - points[0, 0]
@@ -19,7 +18,8 @@ def distance_calc(points):
 
 
 def print_QR_information(image,pts,x, y, barcodeData,  barcodeType):
-    cv2.polylines(image, [pts], True, (0, 255, 0), 3)
+    red, green , blue = border_reconigtion(image, pts)
+    cv2.polylines(image, [pts], True, (red, green, blue), 3)
     string = "Data: " + str(barcodeData) + " | Type: " + str(barcodeType)
     cv2.putText(frame, string, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
     print("Barcode: " + barcodeData + " | Type: " + barcodeType)
@@ -67,7 +67,20 @@ def digtal_zoom(image,scale, code):
     return image, scale
 
 
-
+def border_reconigtion(image, pts):
+    height, width, channels = image.shape
+    left_border = width * 0.2
+    right_border = width * 0.8
+    tracker = points[0,0]
+    if tracker < left_border:
+        red = 255
+        green = 0
+        blue = 0
+    elif tracker > right_border:
+        red = 0
+        green = 255
+        blue = 0
+    return red, green, blue
 # cap = cv2.VideoCapture(0)
 stream = CamGear(source=0).start()
 scale = 1
