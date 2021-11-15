@@ -6,6 +6,10 @@ import cv2
 from pyzbar.pyzbar import decode
 import time
 
+red = 0
+green = 0
+blue = 0
+
 def distance_calc(points):
     print(points)
     width = points[2, 0] - points[0, 0]
@@ -17,9 +21,9 @@ def distance_calc(points):
     return distance
 
 
-def print_QR_information(image,pts,x, y, barcodeData,  barcodeType):
-    red, green , blue = border_reconigtion(image, pts)
-    cv2.polylines(image, [pts], True, (red, green, blue), 3)
+def print_QR_information(image,pts,x, y, barcodeData,  barcodeType, red, green, blue):
+    red, green, blue = border_reconigtion(image, pts, red, green, blue)
+    cv2.polylines(image, [pts], True, (blue, green, red), 3)
     string = "Data: " + str(barcodeData) + " | Type: " + str(barcodeType)
     cv2.putText(frame, string, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
     print("Barcode: " + barcodeData + " | Type: " + barcodeType)
@@ -42,7 +46,7 @@ def decoder(image):
         barcodeData = obj.data.decode("utf-8")
         barcodeType = obj.type
         distance = distance_calc(pts)
-        print_QR_information(image,pts,x ,y, barcodeData, barcodeType)
+        print_QR_information(image,pts,x ,y, barcodeData, barcodeType, red, green, blue)
         print_QR_distance(image, distance)
 
 
@@ -67,16 +71,20 @@ def digtal_zoom(image,scale, code):
     return image, scale
 
 
-def border_reconigtion(image, pts):
+def border_reconigtion(image, pts, red, green, blue):
     height, width, channels = image.shape
     left_border = width * 0.2
     right_border = width * 0.8
-    tracker = points[0,0]
+    tracker = pts[0,0]
     if tracker < left_border:
         red = 255
         green = 0
         blue = 0
     elif tracker > right_border:
+        red = 255
+        green = 0
+        blue = 0
+    else:
         red = 0
         green = 255
         blue = 0
