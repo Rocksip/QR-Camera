@@ -76,7 +76,6 @@ def digtal_zoom(image,scale, code):
     image = cv2.resize(cropped, (width, height))
     return image, scale
 
-
 def border_reconigtion(image, pts, red, green, blue):
     height, width, channels = image.shape
     left_border = width * 0.2
@@ -95,11 +94,10 @@ def border_reconigtion(image, pts, red, green, blue):
         green = 255
         blue = 0
     return red, green, blue
+
 # cap = cv2.VideoCapture(0)
 stream = CamGear(source=0).start()
 scale = 1
-
-
 
 while True:
     frame = stream.read()
