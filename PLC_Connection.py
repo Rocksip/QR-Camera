@@ -22,7 +22,7 @@ print(state)
 
 db = plc.db_read(DB_NUMBER, start_adress, size)
 
-plc.db_write(DB_NUMBER, start_adress, b'snap7 app to plc!')
+plc.db_write(DB_NUMBER, start_adress, b' dit is een test!')
 product_name = db[0:255].decode('UTF-8').strip('\x00')
 print(product_name)
 
@@ -35,4 +35,6 @@ print(product_status)
 product_test = bool(db[258])
 print(product_test)
 
-plc.db_write(DB_NUMBER, 260, b'  this is suppossed to happen')
+buffer = bytearray([0b00010001])
+
+plc.db_write(DB_NUMBER, 260, buffer)

@@ -11,6 +11,20 @@ red = 0
 green = 0
 blue = 0
 
+IP = '192.168.0.1' # ip adress opgegeven voor de PLc
+RACK = 0  # prop plc welk rack, zie foto van PLc links
+SLOT = 1  # Zie divce overvieuw
+
+DB_NUMBER = 100  # aanspreken van datablock adress
+start_adress = 1  # start adress van het data pakket
+size = 259  # + 1 grootste data adress
+
+plc = snap7.client.Client()  # verbinding server van siemens
+plc.connect(IP, RACK, SLOT)  # verbindiing leggen met PLC
+
+plc.get_connected()
+print(plc.get_connected())
+db = plc.db_read(DB_NUMBER, start_adress, size)
 
 def distance_calc(points):
     print(points)
@@ -23,8 +37,8 @@ def distance_calc(points):
     return distance
 
 
-def print_QR_information(image,pts,x, y, barcodeData,  barcodeType, red, green, blue):
-    red, green, blue = border_reconigtion(image, pts, red, green, blue)
+def print_QR_information(image,pts,x, y, barcodeData,  barcodeType):
+    red, green, blue = border_reconigtion(image, pts)
     cv2.polylines(image, [pts], True, (blue, green, red), 3)
     string = "Data: " + str(barcodeData) + " | Type: " + str(barcodeType)
     cv2.putText(frame, string, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
@@ -48,11 +62,11 @@ def decoder(image):
         barcodeData = obj.data.decode("utf-8")
         barcodeType = obj.type
         distance = distance_calc(pts)
-        print_QR_information(image,pts,x ,y, barcodeData, barcodeType, red, green, blue)
+        print_QR_information(image,pts,x ,y, barcodeData, barcodeType)
         print_QR_distance(image, distance)
 
 
-def digtal_zoom(image,scale, code):
+def digtal_zoom(image, scale: object, code):
     height, width, channels = image.shape
     if code == ord('u'):
         scale = scale + 0.05  # +5
@@ -61,7 +75,7 @@ def digtal_zoom(image,scale, code):
         scale = scale - 0.05  # +5
     # centerX, centerY = int(height / 2), int(width / 2)
     # prepare the crop
-    print(scale)
+    # print(scale)
     centerX, centerY = int(height / 2), int(width / 2)
     radiusX, radiusY = int(centerX * scale), int(centerY * scale)
 
@@ -72,24 +86,38 @@ def digtal_zoom(image,scale, code):
     image = cv2.resize(cropped, (width, height))
     return image, scale
 
-def border_reconigtion(image, pts, red, green, blue):
+
+def border_reconigtion(image, pts):
+    db = plc.db_read(DB_NUMBER, start_adress, size)
     height, width, channels = image.shape
     left_border = width * 0.2
     right_border = width * 0.8
-    tracker = pts[0,0]
-    if tracker < left_border:
+    tracker1 = pts[0,0]
+    tracker2 = pts[1,0]
+    if tracker1 < left_border:
         red = 255
         green = 0
         blue = 0
-    elif tracker > right_border:
+        plc.db_write(DB_NUMBER, start_adress, b'  Ga naar rechts')
+
+    elif tracker2 > right_border:
         red = 255
         green = 0
         blue = 0
+        plc.db_write(DB_NUMBER, start_adress, b'  Ga naar links!')
+
+
     else:
         red = 0
         green = 255
         blue = 0
+        plc.db_write(DB_NUMBER, start_adress, b'  Center')
+
+    product_name = db[0:255].decode('UTF-8').strip('\x00')
+    print(product_name)
+
     return red, green, blue
+
 
 # cap = cv2.VideoCapture(0)
 stream = CamGear(source=0).start()
