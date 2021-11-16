@@ -7,13 +7,9 @@ from pyzbar.pyzbar import decode
 import time
 import snap7
 
-
 red = 0
 green = 0
 blue = 0
-
-
-
 
 
 def distance_calc(points):
@@ -111,4 +107,5 @@ while True:
         break  # esc to quit
 cv2.destroyAllWindows()
 stream.stop()
+
 
