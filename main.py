@@ -24,7 +24,7 @@ plc.connect(IP, RACK, SLOT)  # verbindiing leggen met PLC
 
 plc.get_connected()
 print(plc.get_connected())
-db = plc.db_read(DB_NUMBER, start_adress, size)
+
 
 def distance_calc(points):
     print(points)
@@ -105,7 +105,6 @@ def border_reconigtion(image, pts):
         green = 0
         blue = 0
         plc.db_write(DB_NUMBER, start_adress, b'  Ga naar links!')
-
 
     else:
         red = 0
