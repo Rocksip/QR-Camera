@@ -25,6 +25,15 @@ plc.connect(IP, RACK, SLOT)  # verbindiing leggen met PLC
 plc.get_connected()
 print(plc.get_connected())
 
+rechts = "ga naar rechts"
+links = " ga naar links"
+center = "gecenterd"
+encoded_rechts = rechts.encode()
+encoded_links = links.encode()
+encoded_center = center.encode()
+byte_array_rechts = bytearray(encoded_rechts)
+byte_array_links = bytearray(encoded_links)
+byte_array_center = bytearray(encoded_center)
 
 def distance_calc(points):
     print(points)
@@ -98,19 +107,19 @@ def border_reconigtion(image, pts):
         red = 255
         green = 0
         blue = 0
-        plc.db_write(DB_NUMBER, start_adress, b'  Ga naar rechts')
+        plc.db_write(DB_NUMBER, start_adress, byte_array_rechts)
 
     elif tracker2 > right_border:
         red = 255
         green = 0
         blue = 0
-        plc.db_write(DB_NUMBER, start_adress, b'  Ga naar links!')
+        plc.db_write(DB_NUMBER, start_adress, byte_array_links)
 
     else:
         red = 0
         green = 255
         blue = 0
-        plc.db_write(DB_NUMBER, start_adress, b'  Center')
+        plc.db_write(DB_NUMBER, start_adress, byte_array_center)
 
     product_name = db[0:255].decode('UTF-8').strip('\x00')
     print(product_name)

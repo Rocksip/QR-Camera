@@ -38,3 +38,5 @@ print(product_test)
 buffer = bytearray([0b00010001])
 
 plc.db_write(DB_NUMBER, 260, buffer)
+
+plc.db_write(DB_NUMBER, 258, 0xff)
